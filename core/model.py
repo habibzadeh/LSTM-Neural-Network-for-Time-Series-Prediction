@@ -4,9 +4,9 @@ import numpy as np
 import datetime as dt
 from numpy import newaxis
 from core.utils import Timer
-from keras.layers import Dense, Activation, Dropout, LSTM
-from keras.models import Sequential, load_model
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.python.keras.layers import Dense, Activation, Dropout, LSTM
+from tensorflow.python.keras.models import Sequential, load_model
+from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 class Model():
 	"""A class for an building and inferencing an lstm model"""
@@ -89,7 +89,7 @@ class Model():
 	def predict_point_by_point(self, data):
 		#Predict each timestep given the last sequence of true data, in effect only predicting 1 step ahead each time
 		print('[Model] Predicting Point-by-Point...')
-		predicted = self.model.predict(data)
+		predicted = self.model.predict(data, verbose=1)
 		predicted = np.reshape(predicted, (predicted.size,))
 		return predicted
 
@@ -101,7 +101,7 @@ class Model():
 			curr_frame = data[i*prediction_len]
 			predicted = []
 			for j in range(prediction_len):
-				predicted.append(self.model.predict(curr_frame[newaxis,:,:])[0,0])
+				predicted.append(self.model.predict(curr_frame[newaxis,:,:], verbose=1)[0,0])
 				curr_frame = curr_frame[1:]
 				curr_frame = np.insert(curr_frame, [window_size-2], predicted[-1], axis=0)
 			prediction_seqs.append(predicted)
@@ -113,7 +113,7 @@ class Model():
 		curr_frame = data[0]
 		predicted = []
 		for i in range(len(data)):
-			predicted.append(self.model.predict(curr_frame[newaxis,:,:])[0,0])
+			predicted.append(self.model.predict(curr_frame[newaxis,:,:], verbose=1)[0,0])
 			curr_frame = curr_frame[1:]
 			curr_frame = np.insert(curr_frame, [window_size-2], predicted[-1], axis=0)
 		return predicted
